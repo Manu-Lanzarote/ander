@@ -1,0 +1,173 @@
+OCULTAR UN COMPONENTE
+
+Si por el contrario quisiera mostrarlo useState(false) y setOcultar(true)
+
+import { useState } from "react";
+
+function App() {
+  const [ocultar, setOcultar] = useState(true);
+  const onClick = () => {
+    setOcultar(false);
+  };
+  return (
+    <div>
+      <input type="submit" value="Search" onClick={onClick} />
+      {ocultar ? <Results /> : null}
+    </div>
+  );
+}
+
+const Results = () => <h1>PRUEBA</h1>;
+export default App;
+
+====================================================================================================
+
+RUTAS
+
+En el menú de navegación:
+import { Link } from "react-router-dom";
+
+Ejemplo de Link:
+<Link to="./Main.js" className="menu_link">
+    KALYPSE
+</Link>
+
+En App.js:
+import { BrowserRouter, Route } from "react-router-dom";
+<Route exact path="/Main.js">
+    <Main />
+</Route>
+
+MUY IMPORTANTE. Todo el código de las rutas en App.js tiene que quedar dentro de las mismas etiquetas <BrowserRouter></BrowserRouter>
+
+NOTA. Se puden eliminar los .js finales de las rutas de los links para que no aparezca .js en la barra de navegación.
+Si los eliminamos, también tendremos que quitarlos de las rutas dentro de las etiquetas Route dentro de App.js    (En este proyecto las he elimnado).
+
+====================================================================================================
+
+CAMBIAR EL ESTADO DEL COMPONENTE PADRE DESDE EL COMPONENTE HIJO
+Se hace pasando por props al componente hijo la función que creamos en el componente padre.
+
+Por ejemplo, creo la función sumar a la que enviaré por props al componente hijo. En el comnponente hijo crearé un botón que llame a la función y finalmente renderizaré el resultado en el componente padre.
+
+Componente padre:
+
+import { useState } from "react";
+function Sumar() {
+  const [num, setNum] = useState(0);
+  function sumar() {
+    setNum(num + 1);
+  }
+  return (
+    <>
+      <p>{num}</p>
+      <Hijo sumar={sumar} />
+    </Hijo>
+  );
+}
+export default Sumar;
+
+Componente hijo:
+
+function Hijo(){
+  return <button onClick={props.sumar}>SUMAR</button>
+}
+export default Hijo;
+
+..............................
+
+Esto mismo lo podría hacer metiendo la función directamente en el componente hijo e importandolo desde el componente padre.
+
+Componente padre:
+
+import Sumar from "./components/Sumar";
+function App() {
+  return (
+    <>
+      <Sumar />
+    </>
+  );
+}
+export default App;
+
+Componente hijo:
+
+import { useState } from "react";
+function Sumar() {
+  const [num, setNum] = useState(0);
+  function sumar() {
+    setNum(num + 1);
+  }
+  return (
+    <>
+      <p>{num}</p>
+      <button onClick={sumar}>SUMAR</button>
+    </>
+  );
+}
+export default Sumar;
+
+====================================================================================================
+
+GOOGLE CLOUD  --  GOOGLE MAPS
+
+Para poder trabajar con APIs de Google hay que tener una cuenta como Developer y crear un nuevo proyecto con las APIS que necesitamos.  (Tengo cuenta con madrid29@hotmail.com )
+https://console.cloud.google.com/home/dashboard?hl=es&project=awesome-nucleus-301020
+
+En la barra superior de la consola podemos crear el nuevo proyecto o comprobar que estamos en el proyecto correcto. Se accede a todo desde esta consola.
+
+POR SEGURIDAD la clave api está en las notas adhesivas del mac y que POR SEGURIDAD no insertaremos nuestras claves API directamente en el código por que de hacerlo estarían a la vista de todos.
+Lo que haremnos será crear un archivo myKeys.js donde guardaremos nuestras claves y lo importaremos en los componentes que las necesitamos.
+Por último nos aseguraremos de que no subimos este archivo a github por lo que lo incluiremos en .gitignore tal como se explica en manu.txt
+
+Tutorial: https://www.youtube.com/watch?v=PuwGdowtm5s
+
+
+GOOGLE MAPS
+
+Componente myKeys.js:
+
+export default {
+  mapsKey: "AIzaXXXXXXXXXXXXXXXXXXXXXXXXX",
+};
+
+Componente MyMapComponent.js:
+
+import { compose, withProps } from "recompose";
+import {
+  withScriptjs,
+  withGoogleMap,
+  GoogleMap,
+  Marker,
+} from "react-google-maps";
+import myKeys from "../myKeys";
+
+const MyMapComponent = compose(
+  withProps({
+    googleMapURL: `https://maps.googleapis.com/maps/api/js?key=${myKeys.mapsKey}&callback=initMap&libraries=&v=weekly`,
+    loadingElement: <div style={{ height: `100%` }} />,
+    containerElement: <div style={{ height: `100vh`, width: `40vw` }} />,
+    mapElement: <div style={{ height: `100%` }} />,
+  }),
+  withScriptjs,
+  withGoogleMap
+)((props) => (
+  <GoogleMap
+    defaultZoom={10}
+    defaultCenter={{ lat: 28.92106576250419, lng: -13.644772672933705 }}
+  >
+    {props.isMarkerShown && (
+      <Marker position={{ lat: 28.92106576250419, lng: -13.644772672933705 }} />
+    )}
+  </GoogleMap>
+));
+
+export default MyMapComponent;
+
+Componente App.js:
+
+<MyMapComponent isMarkerShown />
+
+===============================================================================================================
+
+
